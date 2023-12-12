@@ -1,5 +1,5 @@
 import {View, Text, StyleSheet} from 'react-native';
-// import Icons from 'react-native-vector-icons';
+import Icons from 'react-native-vector-icons/AntDesign';
 
 export default function AuthTopBar() {
   return (
@@ -14,7 +14,7 @@ export default function AuthTopBar() {
         Cancel
       </Text>
       <Text style={[styles.text]}>nike.com</Text>
-      <Text style={[styles.text]}>retry</Text>
+      <Icons name={'back'} color={'#007AFF'} size={23} />
     </View>
   );
 }
@@ -25,7 +25,7 @@ const styles = StyleSheet.create({
     paddingTop: 10,
     flexDirection: 'row',
     justifyContent: 'space-between',
-    paddingHorizontal: 8,
+    paddingHorizontal: 10,
     alignItems: 'center',
     borderBottomWidth: 2,
     borderBottomColor: '#00000059',

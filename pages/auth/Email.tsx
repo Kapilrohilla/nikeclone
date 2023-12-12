@@ -15,9 +15,8 @@ export default function Email() {
     <View style={styles.emailContainer}>
       <AuthTopBar />
       <View style={styles.contentContainer}>
-        {/* TODO Logo need to replace with dark logo */}
         <Image
-          source={require('../../assets/logo.png')}
+          source={require('../../assets/logo_dark.png')}
           height={18}
           resizeMode={'center'}
           style={styles.logo}
@@ -39,11 +38,9 @@ export default function Email() {
         />
         <View>
           <Text style={[styles.color, styles.fontStyling]}>
-            By continuing, I agree to Nike’s
-          </Text>
-          <Text style={[styles.color, styles.fontStyling]}>
-            <Text style={styles.underLine}>Privacy Policy </Text> and
-            <Text style={styles.underLine}> Term of use</Text>
+            By continuing, I agree to Nike's{' '}
+            <Text style={styles.underLine}>Privacy Policy</Text> and{' '}
+            <Text style={styles.underLine}>Term of use</Text>
           </Text>
         </View>
       </View>
@@ -113,7 +110,7 @@ const styles = StyleSheet.create({
     fontWeight: '400',
     letterSpacing: -0.4,
     color: '#767676',
-    // lineHeight: 100,
+    lineHeight: 25,
     alignSelf: 'stretch',
   },
   underLine: {
