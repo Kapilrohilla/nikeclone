@@ -9,8 +9,11 @@ import {
 import React, {useState} from 'react';
 import AuthTopBar from '../../components/AuthTopBar';
 
-export default function Email() {
+export default function Email({navigation}: any) {
   const [email, setEmail] = useState('');
+  const submitEmail = () => {
+    navigation.navigate('signupform');
+  };
   return (
     <View style={styles.emailContainer}>
       <AuthTopBar />
@@ -44,7 +47,7 @@ export default function Email() {
           </Text>
         </View>
       </View>
-      <TouchableOpacity style={styles.nextBtn}>
+      <TouchableOpacity style={styles.nextBtn} onPress={submitEmail}>
         <Text style={{color: 'white'}}>Next</Text>
       </TouchableOpacity>
     </View>

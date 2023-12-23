@@ -9,7 +9,10 @@ import {
   TouchableOpacity,
 } from 'react-native';
 
-export default function LoginSignupHome() {
+export default function LoginSignupHome({navigation}: any) {
+  const navigateToSigninPage = () => {
+    navigation.navigate('email');
+  };
   return (
     <View style={styles.container}>
       <ImageBackground
@@ -42,7 +45,9 @@ export default function LoginSignupHome() {
                   Join Us
                 </Text>
               </TouchableOpacity>
-              <TouchableOpacity style={[styles.sign, styles.btnsSize]}>
+              <TouchableOpacity
+                style={[styles.sign, styles.btnsSize]}
+                onPress={navigateToSigninPage}>
                 <Text style={styles.btnText}>Sign In</Text>
               </TouchableOpacity>
             </View>

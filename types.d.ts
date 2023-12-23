@@ -1,18 +1,12 @@
 // types for user signup form data
 type userSignupFormData = {
   code: string;
-  firstName: string;
-  lastName: string;
+  name: string;
   password: string;
   dob: string;
 };
-enum signupState {
-  code = 'code',
-  firstName = 'firstName',
-  lastName = 'lastName',
-  password = 'password',
-  dob = 'dob',
-}
+
+signupState = 'code' | 'name' | 'password' | 'dob' | 'reset';
 interface SignupAction {
   type: signupState;
   payload: string;

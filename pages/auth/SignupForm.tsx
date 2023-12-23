@@ -1,46 +1,47 @@
-import {
-  View,
-  Text,
-  ScrollView,
-  StyleSheet,
-  Image,
-  TextInput,
-  Pressable,
-} from 'react-native';
+import {View, Text, ScrollView, StyleSheet, Image, TextInput, Pressable} from 'react-native';
 import AuthTopBar from '../../components/AuthTopBar';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import DatePicker from 'react-native-date-picker';
-import {useReducer, useState} from 'react';
+import {useReducer, useRef, useState} from 'react';
 import BouncyCheckbox from 'react-native-bouncy-checkbox';
-const userFormInitialData: userSignupFormData = {
+const today = new Date().toString();
+
+const formInitialData: userSignupFormData = {
   code: '',
-  firstName: '',
-  lastName: '',
+  name: '',
   password: '',
-  dob: '',
+  dob: today,
 };
 
-export default function SignupForm() {
+export default function SignupForm({navigation}: any) {
   const email = 'kapilrohilla2002@gmail.com';
-  const [fromState, formDispatch] = useReducer(reducer, userFormInitialData);
+  const [formState, formDispatch] = useReducer(reducer, formInitialData);
   const [showPassword, setShowPassword] = useState(false);
-  const [date, setDate] = useState(new Date());
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(false);
+  const isTermConditionAccpeted = useRef(false);
+  const submitForm = () => {
+    if (isTermConditionAccpeted.current === false || formState === formInitialData) {
+      return;
+    } else {
+      navigation.navigate('AccountSetupSplash');
+      formDispatch({
+        type: 'reset',
+        payload: '',
+      });
+    }
+  };
   return (
     <ScrollView style={styles.signupContainer}>
       <AuthTopBar />
       <View style={styles.formContainer}>
-        <Image
-          source={require('../../assets/logo_dark.png')}
-          alt=""
-          resizeMode="contain"
-        />
+        <Image source={require('../../assets/logo_dark.png')} alt="" resizeMode="contain" />
         <Text style={styles.intro}>Now let's make you a Nike members.</Text>
         <Text style={styles.emailChosed}>
           We have send code to {'\n'}
           {email}
           {'  '}
           <Text
+            onPress={() => navigation.navigate('email')}
             style={{
               fontWeight: '600',
               textDecorationLine: 'underline',
@@ -51,11 +52,31 @@ export default function SignupForm() {
         </Text>
         <View style={styles.inputContainer}>
           <Text style={styles.inputTitle}>CODE :</Text>
-          <TextInput style={styles.inputBox} placeholder="Code" />
+          <TextInput
+            style={styles.inputBox}
+            placeholder="Code"
+            value={formState.code}
+            onChangeText={e =>
+              formDispatch({
+                type: 'code',
+                payload: e,
+              })
+            }
+          />
         </View>
         <View style={styles.inputContainer}>
           <Text style={styles.inputTitle}>Full Name :</Text>
-          <TextInput style={styles.inputBox} placeholder="John Doe" />
+          <TextInput
+            style={styles.inputBox}
+            placeholder="John Doe"
+            value={formState.name}
+            onChangeText={e =>
+              formDispatch({
+                type: 'name',
+                payload: e,
+              })
+            }
+          />
         </View>
         <View style={styles.inputContainer}>
           <Text style={styles.inputTitle}>Password :</Text>
@@ -72,7 +93,20 @@ export default function SignupForm() {
                 borderRadius: 6,
               })
             }>
-            <TextInput placeholder="John Doe" secureTextEntry={!showPassword} />
+            <TextInput
+              placeholder="John Doe"
+              secureTextEntry={!showPassword}
+              style={{
+                color: '#000',
+              }}
+              value={formState.password}
+              onChangeText={e => {
+                formDispatch({
+                  type: 'password',
+                  payload: e,
+                });
+              }}
+            />
             <Pressable onPress={() => setShowPassword(!showPassword)}>
               <Icon
                 name={showPassword ? 'visibility-off' : 'visibility'}
@@ -91,7 +125,11 @@ export default function SignupForm() {
             <Icon name="done" color="#767676" size={14} />
             Minimum of 8 character
           </Text>
-          <Text style={{color: '#767676', fontSize: 12}}>
+          <Text
+            style={{
+              color: '#767676',
+              fontSize: 12,
+            }}>
             <Icon name="close" color="#767676" size={14} />
             Uppercase, lettercase and one number
           </Text>
@@ -108,50 +146,94 @@ export default function SignupForm() {
                   alignItems: 'center',
                 },
               ]}>
-              <Text style={{color: 'black'}}>{'Choose Date'}</Text>
+              <Text
+                style={{
+                  color: 'black',
+                }}
+                onPress={() => setOpen(true)}>
+                {/* {formState.dob !== today ? formState.dob : 'Choose Date'} */}
+                {formState.dob}
+              </Text>
               <Pressable onPress={() => setOpen(true)}>
                 <Icon name="calendar-month" color={'#000'} size={20} />
               </Pressable>
               <DatePicker
                 modal
                 open={open}
-                date={date}
+                date={new Date(formState.dob)}
                 onConfirm={date => {
                   setOpen(false);
-                  setDate(date);
+                  formDispatch({
+                    type: 'dob',
+                    payload: date.toString(),
+                  });
                 }}
                 onCancel={() => {
                   setOpen(false);
                 }}
               />
             </View>
-            <Text style={{color: '#767676', paddingLeft: 10, fontSize: 12}}>
+            <Text
+              style={{
+                color: '#767676',
+                paddingLeft: 10,
+                fontSize: 12,
+              }}>
               Get a nike reward on your Birthday.
             </Text>
-            <View style={[styles.checkboxContainer, {marginVertical: 24}]}>
+            <View
+              style={[
+                styles.checkboxContainer,
+                {
+                  marginVertical: 24,
+                },
+              ]}>
               <BouncyCheckbox isChecked={false} />
               <Text style={styles.conditions}>
-                Sign up for emails to get updates from Nike on products, offers
-                and your Member benifits.
+                Sign up for emails to get updates from Nike on products, offers and your Member
+                benifits.
               </Text>
             </View>
-            <View style={[styles.checkboxContainer, {marginBottom: 24}]}>
-              <BouncyCheckbox isChecked={false} onPress={() => {}} />
+            <View
+              style={[
+                styles.checkboxContainer,
+                {
+                  marginBottom: 24,
+                },
+              ]}>
+              <BouncyCheckbox
+                isChecked={false}
+                onPress={() => {
+                  isTermConditionAccpeted.current = true;
+                }}
+              />
               <Text style={styles.conditions}>
                 I agree to Nike{' '}
-                <Text style={{textDecorationLine: 'underline'}}>
+                <Text
+                  style={{
+                    textDecorationLine: 'underline',
+                  }}>
                   Privacy Policy
                 </Text>{' '}
-                and{'\n'}
-                <Text style={{textDecorationLine: 'underline'}}>
+                and
+                {'\n'}
+                <Text
+                  style={{
+                    textDecorationLine: 'underline',
+                  }}>
                   Term and conditions
                 </Text>
                 .
               </Text>
             </View>
           </View>
-          <Pressable style={styles.createAccountBtn}>
-            <Text style={{color: '#fff'}}>Create Account</Text>
+          <Pressable style={styles.createAccountBtn} onPress={submitForm}>
+            <Text
+              style={{
+                color: '#fff',
+              }}>
+              Create Account
+            </Text>
           </Pressable>
         </View>
       </View>
@@ -186,8 +268,14 @@ const styles = StyleSheet.create({
     letterSpacing: -0.4,
     lineHeight: 24,
   },
-  inputTitle: {color: 'black', fontWeight: '600'},
-  checkboxContainer: {flexDirection: 'row', alignItems: 'flex-start'},
+  inputTitle: {
+    color: 'black',
+    fontWeight: '600',
+  },
+  checkboxContainer: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+  },
   textInput: {
     color: '#767676',
     fontSize: 16,
@@ -230,21 +318,17 @@ const styles = StyleSheet.create({
 
 function reducer(state: userSignupFormData, action: SignupAction) {
   const {type, payload} = action;
+  console.log('payload = ', payload);
   switch (type) {
     case 'code':
       return {
         ...state,
         code: payload,
       };
-    case 'firstName':
+    case 'name':
       return {
         ...state,
-        firstName: payload,
-      };
-    case 'lastName':
-      return {
-        ...state,
-        lastName: payload,
+        name: payload,
       };
     case 'password':
       return {
@@ -256,6 +340,10 @@ function reducer(state: userSignupFormData, action: SignupAction) {
         ...state,
         dob: payload,
       };
+    case 'reset': {
+      return formInitialData;
+    }
+    default:
+      return state;
   }
-  return state;
 }
