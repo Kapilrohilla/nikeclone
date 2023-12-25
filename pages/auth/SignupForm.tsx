@@ -23,7 +23,7 @@ export default function SignupForm({navigation}: any) {
     if (isTermConditionAccpeted.current === false || formState === formInitialData) {
       return;
     } else {
-      navigation.navigate('AccountSetupSplash');
+      navigation.navigate('registerSigninSuccess');
       formDispatch({
         type: 'reset',
         payload: '',

@@ -3,16 +3,22 @@ import React, {useState} from 'react';
 import AuthTopBar from '../../components/AuthTopBar';
 import BouncyCheckbox from 'react-native-bouncy-checkbox';
 
-export default function SigninSuccess() {
+export default function RegisterSigninSuccess({navigation}: any) {
+  const [isNewAccount, setIsNewAccount] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
+
+  const navigateNext = () => {
+    if (isNewAccount) {
+      navigation.navigate('AccountSetting');
+    } else {
+      navigation.navigate('Root');
+    }
+  };
   return (
     <View style={{backgroundColor: '#fff', flex: 1}}>
       <AuthTopBar />
       <View style={{paddingHorizontal: 36}}>
-        <Image
-          source={require('../../assets/logo_dark.png')}
-          style={styles.logo}
-        />
+        <Image source={require('../../assets/logo_dark.png')} style={styles.logo} />
         <Text style={styles.intro}>You have been signed in successfully.</Text>
       </View>
       <View style={{paddingHorizontal: 36}}>
@@ -23,7 +29,7 @@ export default function SigninSuccess() {
             setIsChecked(isChecked);
           }}
         />
-        <Pressable style={styles.createAccountBtn}>
+        <Pressable style={styles.createAccountBtn} onPress={navigateNext}>
           <Text style={{color: '#fff'}}>Continue</Text>
         </Pressable>
       </View>

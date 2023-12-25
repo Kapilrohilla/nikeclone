@@ -9,18 +9,15 @@ import {
   TouchableOpacity,
 } from 'react-native';
 
+type moveTo = 'password' | 'signupform';
 export default function LoginSignupHome({navigation}: any) {
-  const navigateToSigninPage = () => {
-    navigation.navigate('email');
+  const navigate = (to: moveTo) => {
+    navigation.navigate('email', {goto: to});
   };
   return (
     <View style={styles.container}>
-      <ImageBackground
-        source={require('../../assets/signup-start-image.png')}
-        style={{flex: 1}}>
-        <ImageBackground
-          source={require('../../assets/overlay.png')}
-          style={{flex: 1}}>
+      <ImageBackground source={require('../../assets/signup-start-image.png')} style={{flex: 1}}>
+        <ImageBackground source={require('../../assets/overlay.png')} style={{flex: 1}}>
           <View style={styles.contentContainer}>
             <Image
               source={require('../../assets/logo.png')}
@@ -34,7 +31,9 @@ export default function LoginSignupHome({navigation}: any) {
             <Text style={styles.font}>inspiration and stories</Text>
             <Text style={styles.font}>and Success.</Text>
             <View style={{gap: 20, flexDirection: 'row', marginTop: 20}}>
-              <TouchableOpacity style={[styles.join, styles.btnsSize]}>
+              <TouchableOpacity
+                onPress={() => navigate('signupform')}
+                style={[styles.join, styles.btnsSize]}>
                 <Text
                   style={[
                     styles.btnText,
@@ -47,7 +46,7 @@ export default function LoginSignupHome({navigation}: any) {
               </TouchableOpacity>
               <TouchableOpacity
                 style={[styles.sign, styles.btnsSize]}
-                onPress={navigateToSigninPage}>
+                onPress={() => navigate('password')}>
                 <Text style={styles.btnText}>Sign In</Text>
               </TouchableOpacity>
             </View>

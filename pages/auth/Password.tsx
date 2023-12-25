@@ -1,32 +1,19 @@
-import {
-  View,
-  Text,
-  StyleSheet,
-  Image,
-  Pressable,
-  TextInput,
-} from 'react-native';
+import {View, Text, StyleSheet, Image, Pressable, TextInput} from 'react-native';
 import React, {useState} from 'react';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import AuthTopBar from '../../components/AuthTopBar';
 
-export default function Password() {
+export default function Password({navigation}: any) {
   const [showPassword, setShowPassword] = useState(false);
   const email = 'kapilrohilla2002@gmail.com';
   return (
     <View style={{backgroundColor: '#fff', flex: 1}}>
       <AuthTopBar />
       <View style={{paddingHorizontal: 36}}>
-        <Image
-          source={require('../../assets/logo_dark.png')}
-          style={styles.logo}
-        />
+        <Image source={require('../../assets/logo_dark.png')} style={styles.logo} />
         <Text style={styles.intro}>What is your password?</Text>
         <Text style={styles.email}>
-          {email}{' '}
-          <Text style={{textDecorationLine: 'underline', color: '#000'}}>
-            Edit
-          </Text>
+          {email} <Text style={{textDecorationLine: 'underline', color: '#000'}}>Edit</Text>
         </Text>
         <Text style={styles.inputTitle}>Password :</Text>
         <View
@@ -44,15 +31,11 @@ export default function Password() {
           }>
           <TextInput placeholder="John Doe" secureTextEntry={!showPassword} />
           <Pressable onPress={() => setShowPassword(!showPassword)}>
-            <Icon
-              name={showPassword ? 'visibility-off' : 'visibility'}
-              size={20}
-              color={'black'}
-            />
+            <Icon name={showPassword ? 'visibility-off' : 'visibility'} size={20} color={'black'} />
           </Pressable>
         </View>
         <Text style={styles.forgot}>Forgotten your password?</Text>
-        <Pressable style={styles.createAccountBtn}>
+        <Pressable style={styles.createAccountBtn} onPress={() => navigation.navigate('Root')}>
           <Text style={{color: '#fff'}}>Create Account</Text>
         </Pressable>
       </View>

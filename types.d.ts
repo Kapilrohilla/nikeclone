@@ -11,3 +11,11 @@ interface SignupAction {
   type: signupState;
   payload: string;
 }
+
+export type Comment = {
+  id: string;
+  name: string;
+  imageUrl: string;
+  time: string;
+  comment: string;
+};

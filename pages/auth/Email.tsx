@@ -1,19 +1,17 @@
-import {
-  View,
-  Text,
-  StyleSheet,
-  Image,
-  TextInput,
-  TouchableOpacity,
-} from 'react-native';
+import {View, Text, StyleSheet, Image, TextInput, TouchableOpacity} from 'react-native';
 import React, {useState} from 'react';
 import AuthTopBar from '../../components/AuthTopBar';
 
-export default function Email({navigation}: any) {
+export default function Email({navigation, route}: any) {
   const [email, setEmail] = useState('');
   const submitEmail = () => {
-    navigation.navigate('signupform');
+    if (route.params.goto === 'password') {
+      navigation.navigate('password');
+    } else {
+      navigation.navigate('signupform');
+    }
   };
+  console.log(route.params.goto, 'route');
   return (
     <View style={styles.emailContainer}>
       <AuthTopBar />
@@ -24,14 +22,10 @@ export default function Email({navigation}: any) {
           resizeMode={'center'}
           style={styles.logo}
         />
-        <Text style={styles.intro}>
-          Enter your Email to join us or sing in.
-        </Text>
+        <Text style={styles.intro}>Enter your Email to join us or sing in.</Text>
         <View style={styles.chooseCountry}>
           <Text style={[styles.countryName]}>United States</Text>
-          <Text style={[styles.changeCountry, styles.color, styles.underLine]}>
-            change
-          </Text>
+          <Text style={[styles.changeCountry, styles.color, styles.underLine]}>change</Text>
         </View>
         <TextInput
           value={email}
@@ -41,9 +35,8 @@ export default function Email({navigation}: any) {
         />
         <View>
           <Text style={[styles.color, styles.fontStyling]}>
-            By continuing, I agree to Nike's{' '}
-            <Text style={styles.underLine}>Privacy Policy</Text> and{' '}
-            <Text style={styles.underLine}>Term of use</Text>
+            By continuing, I agree to Nike's <Text style={styles.underLine}>Privacy Policy</Text>{' '}
+            and <Text style={styles.underLine}>Term of use</Text>
           </Text>
         </View>
       </View>
