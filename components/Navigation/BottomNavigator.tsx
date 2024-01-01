@@ -1,9 +1,9 @@
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import HomeNavigation from './HomeNavigation';
 import ShopNavigation from './ShopNavigation';
-import FavouritesNavigation from './FavouritesNavigation';
 import BagNavigation from './BagNavigation';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import Favourite from '../../pages/Favourite/Favourite';
 
 export default function BottomNavigator() {
   const BottomTab = createBottomTabNavigator();
@@ -30,7 +30,7 @@ export default function BottomNavigator() {
       <BottomTab.Screen
         name={'Favourites'}
         options={{tabBarIcon: () => <Icon name="favorite-outline" color="#767676" size={25} />}}
-        component={FavouritesNavigation}
+        component={Favourite}
       />
       <BottomTab.Screen
         name={'Bag'}
