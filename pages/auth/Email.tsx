@@ -1,17 +1,60 @@
-import {View, Text, StyleSheet, Image, TextInput, TouchableOpacity} from 'react-native';
-import React, {useState} from 'react';
+import {View, Text, StyleSheet, Image, TextInput, TouchableOpacity, Alert} from 'react-native';
+import React, {useContext, useRef} from 'react';
+import {SignupContext} from '../../contexts/signupContext';
 import AuthTopBar from '../../components/AuthTopBar';
+import firestore from '@react-native-firebase/firestore';
 
 export default function Email({navigation, route}: any) {
-  const [email, setEmail] = useState('');
+  const {email, setEmail} = useContext(SignupContext);
+  const userCollection = firestore().collection('users');
+  const errorRef = useRef(false);
+
   const submitEmail = () => {
     if (route.params.goto === 'password') {
       navigation.navigate('password');
     } else {
-      navigation.navigate('signupform');
+      userCollection
+        .where('email', '==', email)
+        .limit(1)
+        .get()
+        .then(snapshot => {
+          console.log('user found');
+          console.log(snapshot.docs);
+          if (snapshot.docs.length === 0) {
+            navigation.navigate('signupform');
+          } else {
+            Alert.alert('user already exists');
+            errorRef.current === true;
+          }
+        })
+        .catch(() => {
+          console.error('error occcurred');
+        });
     }
   };
+
   console.log(route.params.goto, 'route');
+  if (!setEmail) {
+    return;
+  }
+  let inputStyle;
+  if (errorRef.current === false) {
+    inputStyle = [styles.emailInput];
+  } else {
+    inputStyle = [
+      styles.emailInput,
+      {
+        borderColor: 'red',
+      },
+    ];
+  }
+
+  // const inputStyle = [
+  //   styles.emailInput,
+  //   errorRef.current === true && {
+  //     backgroundColor: 'red',
+  //   },
+  // ];
   return (
     <View style={styles.emailContainer}>
       <AuthTopBar />
@@ -29,9 +72,13 @@ export default function Email({navigation, route}: any) {
         </View>
         <TextInput
           value={email}
-          onChangeText={newText => setEmail(newText)}
+          onChangeText={newText => {
+            errorRef.current = false;
+            setEmail(newText);
+          }}
           placeholder="Email"
-          style={styles.emailInput}
+          inputMode={'email'}
+          style={inputStyle}
         />
         <View>
           <Text style={[styles.color, styles.fontStyling]}>

@@ -2,8 +2,13 @@ import {View, Text, ScrollView, StyleSheet, Image, TextInput, Pressable} from 'r
 import AuthTopBar from '../../components/AuthTopBar';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import DatePicker from 'react-native-date-picker';
-import {useReducer, useRef, useState} from 'react';
+import {useContext, useReducer, useRef, useState} from 'react';
 import BouncyCheckbox from 'react-native-bouncy-checkbox';
+import {SignupAction, userSignupFormData} from '../../types';
+import {SignupContext} from '../../contexts/signupContext';
+
+import firestore from '@react-native-firebase/firestore';
+
 const today = new Date().toString();
 
 const formInitialData: userSignupFormData = {
@@ -14,20 +19,37 @@ const formInitialData: userSignupFormData = {
 };
 
 export default function SignupForm({navigation}: any) {
-  const email = 'kapilrohilla2002@gmail.com';
+  const {email} = useContext(SignupContext);
   const [formState, formDispatch] = useReducer(reducer, formInitialData);
   const [showPassword, setShowPassword] = useState(false);
   const [open, setOpen] = useState(false);
   const isTermConditionAccpeted = useRef(false);
+  const userCollection = firestore().collection('users');
   const submitForm = () => {
     if (isTermConditionAccpeted.current === false || formState === formInitialData) {
       return;
     } else {
-      navigation.navigate('registerSigninSuccess');
-      formDispatch({
-        type: 'reset',
-        payload: '',
-      });
+      if (Number(formState.code) === 1111) {
+        userCollection
+          .add({
+            email: email,
+            password: formState.password,
+            dob: formState.dob,
+            name: formState.name,
+          })
+          .then(value => {
+            console.log(value);
+            console.log('user added successfully');
+            navigation.navigate('registerSigninSuccess');
+            formDispatch({
+              type: 'reset',
+              payload: '',
+            });
+          })
+          .catch(() => {
+            console.log('Error: Failed to add user in users collection');
+          });
+      }
     }
   };
   return (
@@ -41,7 +63,7 @@ export default function SignupForm({navigation}: any) {
           {email}
           {'  '}
           <Text
-            onPress={() => navigation.navigate('email')}
+            onPress={() => navigation.goBack()}
             style={{
               fontWeight: '600',
               textDecorationLine: 'underline',
@@ -55,6 +77,7 @@ export default function SignupForm({navigation}: any) {
           <TextInput
             style={styles.inputBox}
             placeholder="Code"
+            inputMode={'numeric'}
             value={formState.code}
             onChangeText={e =>
               formDispatch({
