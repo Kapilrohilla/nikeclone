@@ -1,4 +1,4 @@
-import {View, Text, ScrollView, StyleSheet, Image, TextInput, Pressable} from 'react-native';
+import {View, Text, ScrollView, StyleSheet, Image, TextInput, Pressable, Alert} from 'react-native';
 import AuthTopBar from '../../components/AuthTopBar';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import DatePicker from 'react-native-date-picker';
@@ -8,6 +8,7 @@ import {SignupAction, userSignupFormData} from '../../types';
 import {SignupContext} from '../../contexts/signupContext';
 
 import firestore from '@react-native-firebase/firestore';
+import auth from '@react-native-firebase/auth';
 
 const today = new Date().toString();
 
@@ -25,6 +26,7 @@ export default function SignupForm({navigation}: any) {
   const [open, setOpen] = useState(false);
   const isTermConditionAccpeted = useRef(false);
   const userCollection = firestore().collection('users');
+
   const submitForm = () => {
     if (isTermConditionAccpeted.current === false || formState === formInitialData) {
       return;
@@ -37,8 +39,16 @@ export default function SignupForm({navigation}: any) {
             dob: formState.dob,
             name: formState.name,
           })
-          .then(value => {
-            console.log(value);
+          .then(snapshot => {
+            auth()
+              .createUserWithEmailAndPassword(email!, formState.password)
+              .then(() => {
+                console.log('user created success');
+              })
+              .catch(() =>
+                console.log('Error occurred while calling auth().createUserWithEmailAndPassword()'),
+              );
+            console.log(snapshot);
             console.log('user added successfully');
             navigation.navigate('registerSigninSuccess');
             formDispatch({
@@ -49,6 +59,8 @@ export default function SignupForm({navigation}: any) {
           .catch(() => {
             console.log('Error: Failed to add user in users collection');
           });
+      } else {
+        Alert.alert('Error: Wrong Code');
       }
     }
   };

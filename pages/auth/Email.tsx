@@ -8,8 +8,14 @@ export default function Email({navigation, route}: any) {
   const {email, setEmail} = useContext(SignupContext);
   const userCollection = firestore().collection('users');
   const errorRef = useRef(false);
+  if (!setEmail) {
+    return;
+  }
 
   const submitEmail = () => {
+    if (!email) {
+      return;
+    }
     if (route.params.goto === 'password') {
       navigation.navigate('password');
     } else {
@@ -24,7 +30,7 @@ export default function Email({navigation, route}: any) {
             navigation.navigate('signupform');
           } else {
             Alert.alert('user already exists');
-            errorRef.current === true;
+            errorRef.current = true;
           }
         })
         .catch(() => {
@@ -34,9 +40,6 @@ export default function Email({navigation, route}: any) {
   };
 
   console.log(route.params.goto, 'route');
-  if (!setEmail) {
-    return;
-  }
   let inputStyle;
   if (errorRef.current === false) {
     inputStyle = [styles.emailInput];
