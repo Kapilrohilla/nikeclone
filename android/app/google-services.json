@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "813156545549",
+    "project_id": "nike-native-6818e",
+    "storage_bucket": "nike-native-6818e.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:813156545549:android:87c2cf8848c6f2d7415144",
+        "android_client_info": {
+          "package_name": "com.nike"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC9YRPtYxbvx4ClH2ZEHzsQYdQAU3RtDGk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
