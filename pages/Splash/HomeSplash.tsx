@@ -8,7 +8,7 @@ export default function HomeSplash({navigation}: any) {
 
   const navigateToHomeAfter3seconds = () => {
     setTimeout(() => {
-      navigation.navigate(isLogin ? 'root' : 'Auth');
+      navigation.replace(isLogin ? 'root' : 'Auth');
     }, 1000);
   };
 
