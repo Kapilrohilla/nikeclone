@@ -3,39 +3,42 @@ import React, {useContext, useRef} from 'react';
 import {SignupContext} from '../../contexts/signupContext';
 import AuthTopBar from '../../components/AuthTopBar';
 import firestore from '@react-native-firebase/firestore';
+import auth from '@react-native-firebase/auth';
 
 export default function Email({navigation, route}: any) {
   const {email, setEmail} = useContext(SignupContext);
   const userCollection = firestore().collection('users');
   const errorRef = useRef(false);
+  const emailInputRef: React.LegacyRef<TextInput> = useRef(null);
   if (!setEmail) {
     return;
   }
 
   const submitEmail = () => {
     if (!email) {
+      if (emailInputRef.current !== null) emailInputRef.current.focus();
       return;
     }
     if (route.params.goto === 'password') {
       navigation.navigate('password');
     } else {
-      userCollection
-        .where('email', '==', email)
-        .limit(1)
-        .get()
-        .then(snapshot => {
-          console.log('user found');
-          console.log(snapshot.docs);
-          if (snapshot.docs.length === 0) {
-            navigation.navigate('signupform');
-          } else {
-            Alert.alert('user already exists');
-            errorRef.current = true;
-          }
-        })
-        .catch(() => {
-          console.error('error occcurred');
-        });
+      // userCollection
+      //   .where('email', '==', email)
+      //   .limit(1)
+      //   .get()
+      //   .then(snapshot => {
+      //     console.log('user found');
+      //     console.log(snapshot.docs);
+      //     if (snapshot.docs.length === 0) {
+      navigation.navigate('signupform');
+      //     } else {
+      //       Alert.alert('user already exists');
+      //       errorRef.current = true;
+      //     }
+      //   })
+      //   .catch(() => {
+      //     console.error('error occcurred');
+      //   });
     }
   };
 
@@ -52,12 +55,6 @@ export default function Email({navigation, route}: any) {
     ];
   }
 
-  // const inputStyle = [
-  //   styles.emailInput,
-  //   errorRef.current === true && {
-  //     backgroundColor: 'red',
-  //   },
-  // ];
   return (
     <View style={styles.emailContainer}>
       <AuthTopBar />
@@ -75,6 +72,7 @@ export default function Email({navigation, route}: any) {
         </View>
         <TextInput
           value={email}
+          ref={emailInputRef}
           onChangeText={newText => {
             errorRef.current = false;
             setEmail(newText);

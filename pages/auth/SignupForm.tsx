@@ -1,4 +1,14 @@
-import {View, Text, ScrollView, StyleSheet, Image, TextInput, Pressable, Alert} from 'react-native';
+import {
+  View,
+  Text,
+  ScrollView,
+  StyleSheet,
+  Image,
+  TextInput,
+  Pressable,
+  Alert,
+  ActivityIndicator,
+} from 'react-native';
 import AuthTopBar from '../../components/AuthTopBar';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import DatePicker from 'react-native-date-picker';
@@ -9,6 +19,9 @@ import {SignupContext} from '../../contexts/signupContext';
 
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {useNavigation} from '@react-navigation/native';
+import {CommonActions} from '@react-navigation/native';
 
 const today = new Date().toString();
 
@@ -25,40 +38,99 @@ export default function SignupForm({navigation}: any) {
   const [showPassword, setShowPassword] = useState(false);
   const [open, setOpen] = useState(false);
   const isTermConditionAccpeted = useRef(false);
-  const userCollection = firestore().collection('users');
+  const [loading, setLoading] = useState(false);
+  // const userCollection = firestore().collection('users');
 
+  const removeHistoryFromNavigationStack = () => {
+    navigation.dispatch(
+      CommonActions.reset({
+        index: 0,
+        routes: [{name: 'registerSigninSuccess'}],
+      }),
+    );
+  };
   const submitForm = () => {
     if (isTermConditionAccpeted.current === false || formState === formInitialData) {
       return;
     } else {
       if (Number(formState.code) === 1111) {
-        userCollection
-          .add({
-            email: email,
-            password: formState.password,
-            dob: formState.dob,
-            name: formState.name,
-          })
-          .then(snapshot => {
-            auth()
-              .createUserWithEmailAndPassword(email!, formState.password)
-              .then(() => {
-                console.log('user created success');
-              })
-              .catch(() =>
-                console.log('Error occurred while calling auth().createUserWithEmailAndPassword()'),
-              );
-            console.log(snapshot);
-            console.log('user added successfully');
-            navigation.navigate('registerSigninSuccess');
-            formDispatch({
-              type: 'reset',
-              payload: '',
+        setLoading(true);
+        // userCollection
+        //   .add({
+        //     email: email,
+        //     password: formState.password,
+        //     dob: formState.dob,
+        //     name: formState.name,
+        //   })
+        //   .then(snapshot => {
+        auth()
+          .createUserWithEmailAndPassword(email!, formState.password)
+          .then(r => {
+            r.user.updateProfile({
+              displayName: formState.name,
             });
+            formDispatch({type: 'reset', payload: ''});
+            const uid = auth().currentUser?.uid;
+            console.log('uid----------------');
+            console.log(uid);
+            console.log('token----------------');
+            try {
+              AsyncStorage.setItem('loggedInUID', uid!);
+              removeHistoryFromNavigationStack();
+            } catch (err: unknown) {
+              console.log('Failed to save uid');
+            }
+            console.log('user created success');
+            setLoading(false);
           })
-          .catch(() => {
-            console.log('Error: Failed to add user in users collection');
+          .catch(error => {
+            setLoading(false);
+            switch (error.code) {
+              case 'auth/email-already-in-use': {
+                const string = `Error: Email address ${email} already in use.`;
+                console.log(string);
+                Alert.alert(string);
+                break;
+              }
+              case 'auth/invalid-email': {
+                const string = `Error: Email address ${email} is invalid.`;
+                console.log(string);
+                Alert.alert(string);
+                break;
+              }
+              case 'auth/operation-not-allowed': {
+                const string = `Error: during sign up.`;
+                console.log(string);
+                Alert.alert(string);
+                break;
+              }
+              case 'auth/weak-password': {
+                const string =
+                  'Error: Password is not strong enough. Add additional characters including special characters and numbers.';
+                console.log(string);
+                Alert.alert(string);
+                break;
+              }
+              default:
+                console.log(error.message);
+                break;
+            }
           });
+        // .catch(err => {
+        //   console.log('Error: it occurred while calling auth().createUserWithEmailAndPassword()');
+        //   console.log(err);
+        // });
+        //   console.log(snapshot.firestore.doc);
+        //   console.log('user added successfully');
+        //   navigation.navigate('registerSigninSuccess');
+        //   formDispatch({
+        //     type: 'reset',
+        //     payload: '',
+        //   });
+        // })
+        // .catch(() => {
+        //   console.log('Error: Failed to add user in users collection');
+        // });
       } else {
         Alert.alert('Error: Wrong Code');
       }
@@ -124,7 +196,7 @@ export default function SignupForm({navigation}: any) {
                 alignItems: 'center',
                 borderWidth: 1,
                 borderColor: '#bababa',
-                paddingHorizontal: 20,
+                paddingRight: 20,
                 borderRadius: 6,
               })
             }>
@@ -133,6 +205,8 @@ export default function SignupForm({navigation}: any) {
               secureTextEntry={!showPassword}
               style={{
                 color: '#000',
+                flex: 1,
+                paddingLeft: 20,
               }}
               value={formState.password}
               onChangeText={e => {
@@ -146,6 +220,7 @@ export default function SignupForm({navigation}: any) {
               <Icon
                 name={showPassword ? 'visibility-off' : 'visibility'}
                 size={20}
+                style={{marginRight: 20}}
                 color={'black'}
               />
             </Pressable>
@@ -262,13 +337,20 @@ export default function SignupForm({navigation}: any) {
               </Text>
             </View>
           </View>
-          <Pressable style={styles.createAccountBtn} onPress={submitForm}>
-            <Text
-              style={{
-                color: '#fff',
-              }}>
-              Create Account
-            </Text>
+          <Pressable
+            style={styles.createAccountBtn}
+            onPress={submitForm}
+            disabled={loading && true}>
+            {loading ? (
+              <ActivityIndicator />
+            ) : (
+              <Text
+                style={{
+                  color: '#fff',
+                }}>
+                Create Account
+              </Text>
+            )}
           </Pressable>
         </View>
       </View>
@@ -353,7 +435,6 @@ const styles = StyleSheet.create({
 
 function reducer(state: userSignupFormData, action: SignupAction) {
   const {type, payload} = action;
-  console.log('payload = ', payload);
   switch (type) {
     case 'code':
       return {

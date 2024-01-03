@@ -16,7 +16,7 @@ export default function RegisterSigninSuccess({navigation}: any) {
   };
   return (
     <View style={{backgroundColor: '#fff', flex: 1}}>
-      <AuthTopBar />
+      <AuthTopBar backBtn={false} />
       <View style={{paddingHorizontal: 36}}>
         <Image source={require('../../assets/logo_dark.png')} style={styles.logo} />
         <Text style={styles.intro}>You have been signed in successfully.</Text>

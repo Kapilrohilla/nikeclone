@@ -2,7 +2,7 @@ import {useNavigation} from '@react-navigation/native';
 import {View, Text, StyleSheet, Pressable} from 'react-native';
 import Icons from 'react-native-vector-icons/AntDesign';
 
-export default function AuthTopBar() {
+export default function AuthTopBar({backBtn = true}: {backBtn?: boolean}) {
   const navigation = useNavigation();
   return (
     <View style={styles.container}>
@@ -16,9 +16,13 @@ export default function AuthTopBar() {
         Cancel
       </Text>
       <Text style={[styles.text]}>nike.com</Text>
-      <Pressable onPress={() => navigation.goBack()}>
-        <Icons name={'back'} color={'#007AFF'} size={23} />
-      </Pressable>
+      {backBtn ? (
+        <Pressable onPress={() => navigation.goBack()}>
+          <Icons name={'back'} color={'#007AFF'} size={23} />
+        </Pressable>
+      ) : (
+        <View></View>
+      )}
     </View>
   );
 }
