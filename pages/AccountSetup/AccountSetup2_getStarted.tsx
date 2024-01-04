@@ -8,11 +8,14 @@ type getStartedProps = {
 export default function AccountSetup2_getStarted(props: getStartedProps) {
   return (
     <>
-      <View style={{marginVertical: 20}}>
-        <Text style={{fontSize: 32, fontWeight: '500', lineHeight: 38}}>{props.title}</Text>
-      </View>
+      {/* <View style={{marginVertical: 20}}>
+        <Text style={{fontSize: 32, fontWeight: '500', lineHeight: 38, paddingHorizontal: 10}}>
+          {props.title}
+        </Text>
+      </View> */}
       <View style={{flex: 1, justifyContent: 'flex-end', paddingBottom: 60}}>
         <TouchableOpacity
+          onPress={props.handleGetStarted}
           style={{
             backgroundColor: '#fff',
             marginHorizontal: 80,
