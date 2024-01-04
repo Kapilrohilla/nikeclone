@@ -1,7 +1,13 @@
 import {View, Text, StyleSheet, Image} from 'react-native';
-import React from 'react';
+import React, {useEffect} from 'react';
 
-export default function AccountSetupSplash() {
+export default function AccountSetupSplash({navigation}: {navigation: any}) {
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      navigation.replace('setupStart');
+    }, 3000);
+    return () => clearTimeout(timeout);
+  }, []);
   return (
     <View style={styles.container}>
       <View>
