@@ -45,7 +45,7 @@ export default function SignupForm({navigation}: any) {
     navigation.dispatch(
       CommonActions.reset({
         index: 0,
-        routes: [{name: 'registerSigninSuccess'}],
+        routes: [{name: 'registerSigninSuccess', params: {goto: 'accountSetup'}}],
       }),
     );
   };

@@ -7,6 +7,8 @@ export default function HomeSplash({navigation}: any) {
   const image = require('../../assets/logo.png');
 
   const navigateToHomeAfter3seconds = () => {
+    // navigation.replace('AccountSetting');
+    // return;
     setTimeout(() => {
       navigation.replace(isLogin ? 'root' : 'Auth');
     }, 1000);

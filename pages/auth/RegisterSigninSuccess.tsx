@@ -2,14 +2,22 @@ import {View, Text, Image, StyleSheet, Pressable} from 'react-native';
 import React, {useState} from 'react';
 import AuthTopBar from '../../components/AuthTopBar';
 import BouncyCheckbox from 'react-native-bouncy-checkbox';
+import {CommonActions} from '@react-navigation/native';
 
-export default function RegisterSigninSuccess({navigation}: any) {
-  const [isNewAccount, setIsNewAccount] = useState(false);
+export default function RegisterSigninSuccess({navigation, route}: any) {
+  // const [isNewAccount, setIsNewAccount] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
-
+  console.log(route.params.goto);
+  const isNewAccount = route.params?.goto;
   const navigateNext = () => {
-    if (isNewAccount) {
-      navigation.navigate('AccountSetting');
+    if (isNewAccount === 'accountSetup') {
+      navigation.dispatch(
+        CommonActions.reset({
+          index: 0,
+          routes: [{name: 'AccountSetting'}],
+        }),
+      );
+      // navigation.navigate('AccountSetting');
     } else {
       navigation.navigate('Root');
     }
@@ -25,6 +33,7 @@ export default function RegisterSigninSuccess({navigation}: any) {
         <BouncyCheckbox
           text="Don't show me again"
           style={{marginVertical: 42}}
+          isChecked={isChecked}
           onPress={(isChecked: boolean) => {
             setIsChecked(isChecked);
           }}
