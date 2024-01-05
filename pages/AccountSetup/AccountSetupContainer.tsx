@@ -10,19 +10,21 @@ import {
 } from 'react-native';
 import React, {useState} from 'react';
 import AccountSetup2_getStarted from './AccountSetup2_getStarted';
-import BouncyCheckbox from 'react-native-bouncy-checkbox';
 import AccountSettingCheckBoxCard from '../../components/AccountSettingCheckBoxCard';
 import {ScrollView} from '@gluestack-ui/themed';
 
 export default function AccountSetupContainer() {
   const screenWidth = Dimensions.get('screen').width;
-  const [selectedGender, setSelectedGender] = useState(null);
+  // const [selectedGender, setSelectedGender] = useState(null);
   const totalScrollerWdith = screenWidth - 100;
   const [page, setPage] = useState(1);
   const title = [
     "To personalize your  experience and connect you to sport, we've got a few questions for you.",
     'First up, which product do you use the most?',
     'What sports, brands and collections are you interested in?',
+    'Stay in the know with the notifications about First Access to product, invites to experiences, personalized orffers, and order updated.',
+    'Want to sue Location Services to help you find the closest Nike Store, access in-store and location-based features, and see experiences near you?',
+    "Congrulats! You're now part of a growing community of Nike Members helping to build the future of sport. Together.",
   ];
 
   let backgroundDarkenCss;
@@ -57,7 +59,7 @@ export default function AccountSetupContainer() {
                 style={{
                   height: '100%',
                   backgroundColor: '#fff',
-                  width: (totalScrollerWdith / 9) * page,
+                  width: (totalScrollerWdith / 6) * page,
                   borderRadius: 99,
                 }}></View>
             </View>
@@ -126,6 +128,54 @@ export default function AccountSetupContainer() {
                 ),
               )}
             </ScrollView>
+          )}
+          {page === 4 && (
+            <View style={{flex: 1, justifyContent: 'flex-end', paddingBottom: 60}}>
+              <TouchableOpacity
+                onPress={() => setPage(5)}
+                style={{
+                  backgroundColor: '#fff',
+                  marginHorizontal: 80,
+                  height: 51,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  borderRadius: 9999,
+                }}>
+                <Text style={{color: '#000', fontWeight: '500', fontSize: 15}}>Next</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+          {page === 5 && (
+            <View style={{flex: 1, justifyContent: 'flex-end', paddingBottom: 60}}>
+              <TouchableOpacity
+                onPress={() => setPage(6)}
+                style={{
+                  backgroundColor: '#fff',
+                  marginHorizontal: 80,
+                  height: 51,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  borderRadius: 9999,
+                }}>
+                <Text style={{color: '#000', fontWeight: '500', fontSize: 15}}>Next</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+          {page === 6 && (
+            <View style={{flex: 1, justifyContent: 'flex-end', paddingBottom: 60}}>
+              <TouchableOpacity
+                onPress={() => setPage(7)}
+                style={{
+                  backgroundColor: '#fff',
+                  marginHorizontal: 80,
+                  height: 51,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  borderRadius: 9999,
+                }}>
+                <Text style={{color: '#000', fontWeight: '500', fontSize: 15}}>Next</Text>
+              </TouchableOpacity>
+            </View>
           )}
         </ImageBackground>
       </ImageBackground>
