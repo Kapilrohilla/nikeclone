@@ -1,20 +1,32 @@
 import {View, StyleSheet, Image} from 'react-native';
 import React, {useEffect, useState} from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 // type navigation: any
 
 export default function HomeSplash({navigation}: any) {
   const [isLogin, setIslogin] = useState(false);
   const image = require('../../assets/logo.png');
 
-  const navigateToHomeAfter3seconds = () => {
-    // navigation.replace('AccountSetting');
-    // return;
-    setTimeout(() => {
-      navigation.replace(isLogin ? 'root' : 'Auth');
-    }, 1000);
+  const extractToken = async () => {
+    const token = await AsyncStorage.getItem('token');
+    console.log('token: ', token);
+    if (token) {
+      setIslogin(true);
+    } else {
+      setIslogin(false);
+    }
   };
 
-  useEffect(navigateToHomeAfter3seconds, []);
+  useEffect(() => {
+    console.log('effect running');
+    extractToken();
+    // navigateToHomeAfter3seconds;
+    const timer = setTimeout(() => {
+      // console.log(isLogin, 0);
+      navigation.replace(isLogin ? 'Root' : 'Auth');
+    }, 3000);
+    return () => clearTimeout(timer);
+  }, [isLogin]);
 
   return (
     <View style={styles.container}>
