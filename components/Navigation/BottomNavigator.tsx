@@ -4,6 +4,7 @@ import ShopNavigation from './ShopNavigation';
 import BagNavigation from './BagNavigation';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import Favourite from '../../pages/Favourite/Favourite';
+import ProfileNavigation from './ProfileNavigation';
 
 export default function BottomNavigator() {
   const BottomTab = createBottomTabNavigator();
@@ -40,7 +41,7 @@ export default function BottomNavigator() {
       <BottomTab.Screen
         name={'Profile'}
         options={{tabBarIcon: () => <Icon name="person" color="#767676" size={25} />}}
-        component={ShopNavigation}
+        component={ProfileNavigation}
       />
     </BottomTab.Navigator>
   );
