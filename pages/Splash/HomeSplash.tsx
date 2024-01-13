@@ -8,21 +8,16 @@ export default function HomeSplash({navigation}: any) {
   const image = require('../../assets/logo.png');
 
   const extractToken = async () => {
-    const token = await AsyncStorage.getItem('token');
-    console.log('token: ', token);
-    if (token) {
+    const user = await AsyncStorage.getItem('user');
+    console.log(user);
+    if (user) {
       setIslogin(true);
-    } else {
-      setIslogin(false);
     }
   };
 
   useEffect(() => {
-    console.log('effect running');
     extractToken();
-    // navigateToHomeAfter3seconds;
     const timer = setTimeout(() => {
-      // console.log(isLogin, 0);
       navigation.replace(isLogin ? 'Root' : 'Auth');
     }, 3000);
     return () => clearTimeout(timer);

@@ -3,15 +3,12 @@ import React, {useState} from 'react';
 import AuthTopBar from '../../components/AuthTopBar';
 import BouncyCheckbox from 'react-native-bouncy-checkbox';
 import {CommonActions} from '@react-navigation/native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function RegisterSigninSuccess({navigation, route}: any) {
-  // const [isNewAccount, setIsNewAccount] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
   console.log(route.params?.goto);
   const isNewAccount = route.params?.goto;
   const navigateNext = () => {
-    AsyncStorage.setItem('token', 'loggedin');
     if (isNewAccount === 'accountSetup') {
       navigation.dispatch(
         CommonActions.reset({
@@ -19,7 +16,6 @@ export default function RegisterSigninSuccess({navigation, route}: any) {
           routes: [{name: 'AccountSetting'}],
         }),
       );
-      // navigation.navigate('AccountSetting');
     } else {
       navigation.navigate('Root');
     }

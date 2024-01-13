@@ -1,6 +1,6 @@
 import React from 'react';
-// import {GluestackUIProvider} from '@gluestack-ui/themed';
-// import {config} from '@gluestack-ui/config';
+import {GluestackUIProvider} from '@gluestack-ui/themed';
+import {config} from '@gluestack-ui/config';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import BottomNavigator from './components/Navigation/BottomNavigator';
@@ -12,15 +12,17 @@ export default function App() {
   const Stack = createNativeStackNavigator();
 
   return (
-    // <GluestackUIProvider config={config}>
-    <NavigationContainer>
-      <Stack.Navigator initialRouteName={'HomeSplash'} screenOptions={{headerShown: false}}>
-        <Stack.Screen name="HomeSplash" component={HomeSplash} />
-        <Stack.Screen name="Auth" component={AuthNavigation} />
-        <Stack.Screen name="AccountSetting" component={AccountSettings} />
-        <Stack.Screen name="Root" component={BottomNavigator} />
-      </Stack.Navigator>
-    </NavigationContainer>
-    // </GluestackUIProvider>
+    <GluestackUIProvider config={config}>
+      <NavigationContainer>
+        <Stack.Navigator initialRouteName={'HomeSplash'} screenOptions={{headerShown: false}}>
+          <Stack.Screen name="HomeSplash" component={HomeSplash} />
+          <Stack.Screen name="Auth" component={AuthNavigation} />
+          <Stack.Screen name="AccountSetting" component={AccountSettings} />
+          <Stack.Screen name="Root" component={BottomNavigator} />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </GluestackUIProvider>
   );
 }
+
+export const BASEURL = 'https://9ab5-2409-40d0-e-57e2-30e6-e87f-dedc-4654.ngrok-free.app';

@@ -22,14 +22,16 @@ import auth from '@react-native-firebase/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useNavigation} from '@react-navigation/native';
 import {CommonActions} from '@react-navigation/native';
+import {Toast, ToastTitle, useToast} from '@gluestack-ui/themed';
+import {Dimensions} from 'react-native';
+
+import {BASEURL} from '../../App';
 
 const today = new Date().toString();
 
 const formInitialData: userSignupFormData = {
-  code: '',
   name: '',
   password: '',
-  dob: today,
 };
 
 export default function SignupForm({navigation}: any) {
@@ -39,7 +41,19 @@ export default function SignupForm({navigation}: any) {
   const [open, setOpen] = useState(false);
   const isTermConditionAccpeted = useRef(false);
   const [loading, setLoading] = useState(false);
+  const toast = useToast();
   // const userCollection = firestore().collection('users');
+
+  const dateFormatter = (newDate?: Date) => {
+    let date;
+    if (newDate) {
+      date = new Date(newDate);
+    } else {
+      date = new Date();
+    }
+    const date2Display = [date.getDate(), date.getMonth() + 1, date.getFullYear()].join('-');
+    return date2Display;
+  };
 
   const removeHistoryFromNavigationStack = () => {
     navigation.dispatch(
@@ -49,93 +63,91 @@ export default function SignupForm({navigation}: any) {
       }),
     );
   };
+
   const submitForm = () => {
-    if (isTermConditionAccpeted.current === false || formState === formInitialData) {
-      return;
-    } else {
-      if (Number(formState.code) === 1111) {
-        setLoading(true);
-        // userCollection
-        //   .add({
-        //     email: email,
-        //     password: formState.password,
-        //     dob: formState.dob,
-        //     name: formState.name,
-        //   })
-        //   .then(snapshot => {
-        auth()
-          .createUserWithEmailAndPassword(email!, formState.password)
-          .then(r => {
-            r.user.updateProfile({
-              displayName: formState.name,
-            });
-            formDispatch({type: 'reset', payload: ''});
-            const uid = auth().currentUser?.uid;
-            console.log('uid----------------');
-            console.log(uid);
-            console.log('token----------------');
-            try {
-              AsyncStorage.setItem('loggedInUID', uid!);
-              removeHistoryFromNavigationStack();
-            } catch (err: unknown) {
-              console.log('Failed to save uid');
-            }
-            console.log('user created success');
-            setLoading(false);
-          })
-          .catch(error => {
-            setLoading(false);
-            switch (error.code) {
-              case 'auth/email-already-in-use': {
-                const string = `Error: Email address ${email} already in use.`;
-                console.log(string);
-                Alert.alert(string);
-                break;
-              }
-              case 'auth/invalid-email': {
-                const string = `Error: Email address ${email} is invalid.`;
-                console.log(string);
-                Alert.alert(string);
-                break;
-              }
-              case 'auth/operation-not-allowed': {
-                const string = `Error: during sign up.`;
-                console.log(string);
-                Alert.alert(string);
-                break;
-              }
-              case 'auth/weak-password': {
-                const string =
-                  'Error: Password is not strong enough. Add additional characters including special characters and numbers.';
-                console.log(string);
-                Alert.alert(string);
-                break;
-              }
-              default:
-                console.log(error.message);
-                break;
-            }
+    const myHeaders = new Headers();
+    myHeaders.append('Content-Type', 'application/json');
+    setLoading(true);
+    var raw = JSON.stringify({
+      email: email,
+      password: formState.password,
+      name: formState.name,
+    });
+
+    var requestOptions = {
+      method: 'POST',
+      headers: myHeaders,
+      body: raw,
+    };
+
+    const signupUrl = `${BASEURL}/auth/signup`;
+    console.log(signupUrl);
+    fetch(signupUrl, requestOptions)
+      .then(response => response.json())
+      .then(result => {
+        setLoading(false);
+        console.log(result);
+        if (!result?.valid) {
+          toast.show({
+            placement: 'top',
+            duration: 2000,
+            render: ({id}) => {
+              const toastId = 'toast-' + id;
+              return (
+                <Toast
+                  nativeID={toastId}
+                  width={Dimensions.get('screen').width - 10}
+                  action="error"
+                  variant="accent">
+                  <ToastTitle>{result?.message}</ToastTitle>
+                </Toast>
+              );
+            },
           });
-        // .catch(err => {
-        //   console.log('Error: it occurred while calling auth().createUserWithEmailAndPassword()');
-        //   console.log(err);
-        // });
-        //   console.log(snapshot.firestore.doc);
-        //   console.log('user added successfully');
-        //   navigation.navigate('registerSigninSuccess');
-        //   formDispatch({
-        //     type: 'reset',
-        //     payload: '',
-        //   });
-        // })
-        // .catch(() => {
-        //   console.log('Error: Failed to add user in users collection');
-        // });
-      } else {
-        Alert.alert('Error: Wrong Code');
-      }
-    }
+        } else {
+          toast.show({
+            placement: 'top',
+            duration: 2000,
+            render: ({id}) => {
+              const toastId = 'toast-' + id;
+              return (
+                <Toast
+                  nativeID={toastId}
+                  width={Dimensions.get('screen').width - 10}
+                  action="attention"
+                  variant="accent">
+                  <ToastTitle>Signup successful</ToastTitle>
+                </Toast>
+              );
+            },
+          });
+          AsyncStorage.setItem('user', JSON.stringify(result?.message)).then(r =>
+            console.log('user info stored in database'),
+          );
+          removeHistoryFromNavigationStack();
+        }
+      })
+      .catch(error => {
+        toast.show({
+          placement: 'top',
+          duration: 2000,
+          render: ({id}) => {
+            const toastId = 'toast-' + id;
+            return (
+              <Toast
+                nativeID={toastId}
+                width={Dimensions.get('screen').width - 10}
+                action="error"
+                variant="accent">
+                <ToastTitle>{error?.message}</ToastTitle>
+              </Toast>
+            );
+          },
+        });
+        setLoading(false);
+      });
   };
+
   return (
     <ScrollView style={styles.signupContainer}>
       <AuthTopBar />
@@ -156,21 +168,6 @@ export default function SignupForm({navigation}: any) {
             Edit
           </Text>
         </Text>
-        <View style={styles.inputContainer}>
-          <Text style={styles.inputTitle}>CODE :</Text>
-          <TextInput
-            style={styles.inputBox}
-            placeholder="Code"
-            inputMode={'numeric'}
-            value={formState.code}
-            onChangeText={e =>
-              formDispatch({
-                type: 'code',
-                payload: e,
-              })
-            }
-          />
-        </View>
         <View style={styles.inputContainer}>
           <Text style={styles.inputTitle}>Full Name :</Text>
           <TextInput
@@ -227,26 +224,31 @@ export default function SignupForm({navigation}: any) {
           </View>
           <Text
             style={{
-              color: '#767676',
+              color: formState.password.length < 8 ? '#767676' : '#32862B',
               fontSize: 12,
               justifyContent: 'center',
               alignItems: 'flex-end',
             }}>
-            <Icon name="done" color="#767676" size={14} />
-            Minimum of 8 character
+            <Icon
+              name="done"
+              color={formState.password.length < 8 ? '#767676' : '#32862B'}
+              size={14}
+            />
+            {'Minimum of 8 character'}
           </Text>
-          <Text
+          {/* <Text
             style={{
               color: '#767676',
               fontSize: 12,
             }}>
             <Icon name="close" color="#767676" size={14} />
             Uppercase, lettercase and one number
-          </Text>
+          </Text> */}
 
           <View style={styles.inputContainer}>
-            <Text style={styles.inputTitle}>Date of Birth :</Text>
-            <View
+            {/* <Text style={styles.inputTitle}>Date of Birth :</Text> */}
+            {/* <View
+          
               style={[
                 styles.inputBox,
                 {
@@ -261,8 +263,6 @@ export default function SignupForm({navigation}: any) {
                   color: 'black',
                 }}
                 onPress={() => setOpen(true)}>
-                {/* {formState.dob !== today ? formState.dob : 'Choose Date'} */}
-                {formState.dob}
               </Text>
               <Pressable onPress={() => setOpen(true)}>
                 <Icon name="calendar-month" color={'#000'} size={20} />
@@ -270,19 +270,24 @@ export default function SignupForm({navigation}: any) {
               <DatePicker
                 modal
                 open={open}
-                date={new Date(formState.dob)}
+                mode={'date'}
+                maximumDate={new Date()}
+                date={new Date(dateFormatter())}
                 onConfirm={date => {
+                  // console.log(date);
                   setOpen(false);
+                  const formattedDate = dateFormatter(date);
+                  console.log(formattedDate);
                   formDispatch({
                     type: 'dob',
-                    payload: date.toString(),
+                    payload: formattedDate,
                   });
                 }}
                 onCancel={() => {
                   setOpen(false);
                 }}
               />
-            </View>
+            </View> */}
             <Text
               style={{
                 color: '#767676',
@@ -291,7 +296,7 @@ export default function SignupForm({navigation}: any) {
               }}>
               Get a nike reward on your Birthday.
             </Text>
-            <View
+            {/* <View
               style={[
                 styles.checkboxContainer,
                 {
@@ -303,12 +308,13 @@ export default function SignupForm({navigation}: any) {
                 Sign up for emails to get updates from Nike on products, offers and your Member
                 benifits.
               </Text>
-            </View>
+            </View> */}
             <View
               style={[
                 styles.checkboxContainer,
                 {
-                  marginBottom: 24,
+                  // marginBottom: 24 ,
+                  marginVertical: 24,
                 },
               ]}>
               <BouncyCheckbox
@@ -340,7 +346,7 @@ export default function SignupForm({navigation}: any) {
           <Pressable
             style={styles.createAccountBtn}
             onPress={submitForm}
-            disabled={loading && true}>
+            disabled={!loading && !formState.name && !formState.password}>
             {loading ? (
               <ActivityIndicator />
             ) : (

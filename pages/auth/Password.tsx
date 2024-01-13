@@ -1,24 +1,41 @@
-import {View, Text, StyleSheet, Image, Pressable, TextInput, Alert} from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  Pressable,
+  TextInput,
+  Alert,
+  Dimensions,
+  ActivityIndicator,
+} from 'react-native';
 import React, {useContext, useState} from 'react';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import AuthTopBar from '../../components/AuthTopBar';
 import {SignupContext} from '../../contexts/signupContext';
 import Auth from '@react-native-firebase/auth';
-import Firestore from '@react-native-firebase/firestore';
 import {CommonActions} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import auth from '@react-native-firebase/auth';
+import {Toast, useToast} from '@gluestack-ui/themed';
+import {ToastTitle} from '@gluestack-ui/themed';
+import {BASEURL} from '../../App';
 
 export default function Password({navigation}: any) {
   const [showPassword, setShowPassword] = useState(false);
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
   const {email} = useContext(SignupContext);
   console.log(email, password, ' email password');
   if (!email) {
     return;
   }
 
+  const toast = useToast();
   const removeHistoryFromNavigationStack = () => {
+    console.log('============');
+    console.log('navigating to nextpage');
+    console.log('============');
     navigation.dispatch(
       CommonActions.reset({
         index: 0,
@@ -31,22 +48,68 @@ export default function Password({navigation}: any) {
     if (!email || !password) {
       return;
     } else {
-      Auth()
-        .signInWithEmailAndPassword(email, password)
-        .then(r => {
-          console.log('success');
-          console.log(r.user);
-          const uid = auth().currentUser?.uid;
-          try {
-            AsyncStorage.setItem('loggedInUID', uid!);
+      setLoading(true);
+      var myHeaders = new Headers();
+      myHeaders.append('Content-Type', 'application/json');
+
+      var raw = JSON.stringify({email, password});
+
+      var requestOptions = {
+        method: 'POST',
+        headers: myHeaders,
+        body: raw,
+      };
+
+      const apiUrl = `${BASEURL}/auth/login`;
+
+      fetch(apiUrl, requestOptions)
+        .then(response => response.json())
+        .then(result => {
+          console.log(result);
+          setLoading(false);
+          if (!result?.valid) {
+            console.log('Something bad occurred');
+            toast.show({
+              placement: 'top',
+              render: ({id}) => {
+                const toastId = 'toast-' + id;
+                return (
+                  <Toast
+                    nativeID={toastId}
+                    width={Dimensions.get('screen').width - 20}
+                    action="error"
+                    variant="accent">
+                    <ToastTitle>{result?.message || 'Invalid Credentials'}</ToastTitle>
+                  </Toast>
+                );
+              },
+            });
+          } else {
+            console.log('saving and navigating..');
+            AsyncStorage.setItem('user', JSON.stringify(result?.message)).then(r =>
+              console.log('user info stored in database'),
+            );
+            toast.show({
+              placement: 'top',
+              render: ({id}) => {
+                const toastId = 'toast-' + id;
+                return (
+                  <Toast
+                    nativeID={toastId}
+                    width={Dimensions.get('screen').width - 20}
+                    action="attention"
+                    variant="accent">
+                    <ToastTitle>LoggedIn successfull</ToastTitle>
+                  </Toast>
+                );
+              },
+            });
             removeHistoryFromNavigationStack();
-          } catch (err: unknown) {
-            console.log('Failed to save uid');
           }
-          removeHistoryFromNavigationStack();
         })
-        .catch(err => {
-          Alert.alert('invalid credential');
+        .catch(error => {
+          setLoading(false);
+          console.log('error', error);
         });
     }
   };
@@ -90,8 +153,8 @@ export default function Password({navigation}: any) {
           </Pressable>
         </View>
         <Text style={styles.forgot}>Forgotten your password?</Text>
-        <Pressable style={styles.createAccountBtn} onPress={handleSignin}>
-          <Text style={{color: '#fff'}}>Create Account</Text>
+        <Pressable style={styles.loginBtn} onPress={handleSignin}>
+          {loading ? <ActivityIndicator /> : <Text style={{color: '#fff'}}>Sign In</Text>}
         </Pressable>
       </View>
     </View>
@@ -99,7 +162,7 @@ export default function Password({navigation}: any) {
 }
 
 const styles = StyleSheet.create({
-  createAccountBtn: {
+  loginBtn: {
     backgroundColor: '#000',
     justifyContent: 'center',
     alignItems: 'center',
